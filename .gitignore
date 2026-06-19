@@ -1,0 +1,32 @@
+# Vivado generated folders
+.Xil/
+SoC_best_vga_rgb_2.gen/
+SoC_best_vga_rgb_2.runs/
+SoC_best_vga_rgb_2.sim/
+SoC_best_vga_rgb_2.cache/
+SoC_best_vga_rgb_2.hw/
+SoC_best_vga_rgb_2.tmp/
+SoC_best_vga_rgb_2.ip_user_files/
+
+# Vivado logs / reports
+*.jou
+*.log
+*.str
+*.rpt
+*.dcp
+*.vdi
+
+# Bitstream / generated outputs
+*.bit
+*.bin
+*.mcs
+*.ltx
+
+# Simulation outputs
+*.wdb
+*.vcd
+
+# OS/editor files
+.DS_Store
+Thumbs.db
+*.swp
