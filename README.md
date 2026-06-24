@@ -118,12 +118,9 @@ VGA Monitor
 <br>
 
 ### 5.2 Block Design
+.
 
-이미지 파일을 `images` 폴더에 넣은 뒤 아래 코드로 README에 추가할 수 있습니다.
-
-```md
-![Block Design](./images/Block Diagram_Select_Filter.png)
-```
+<img src="./images/Block%20Diagram_Select_Filter.png" width="700">
 
 <br>
 
