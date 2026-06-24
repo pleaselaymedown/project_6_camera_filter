@@ -211,6 +211,8 @@ MicroBlaze-V가 AXI4-Lite Register에 `filter_sel` 값을 쓰면, 해당 값에 
 
 <br>
 
+```
+
 **Register Map**
 
 | Address | Register          | 설명       |
@@ -218,6 +220,8 @@ MicroBlaze-V가 AXI4-Lite Register에 `filter_sel` 값을 쓰면, 해당 값에 
 | `0x00`  | `filter_sel[2:0]` | 필터 모드 선택 |
 
 <br>
+
+```
 
 **Filter Mode**
 
