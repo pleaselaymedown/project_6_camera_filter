@@ -126,14 +126,16 @@ VGA Monitor
 
 ## 🎬 7. Demonstration (시연 영상)
 
-<br>
+<br><br>
 
-[![Video](./images/youtube.png)](https://www.youtube.com/watch?v=QpY_T1iv3Es)
+<a href="https://www.youtube.com/watch?v=QpY_T1iv3Es">
+  <img src="./images/youtube.png" width="500">
+</a>
 
 ### *이미지를 클릭하면 시연 영상으로 이동합니다.*
 
 
-<br>
+<br><br>
 
 필터별 결과 이미지를 넣고 싶으면 아래처럼 작성할 수 있습니다.
 
@@ -173,6 +175,7 @@ VGA Monitor
 
 - 카메라 초기화가 완료된 이후부터 영상 캡처가 시작되어 VGA 출력이 안정화됨
 
+<br>
 
 
 ### 10.2 VGA 화면 좌측 노이즈 픽셀 문제
@@ -199,6 +202,7 @@ VGA Monitor
 
 - 좌측 노이즈 픽셀이 줄어들고 카메라 영상이 VGA 화면 중앙에 안정적으로 표시됨
 
+<br>
 
 ### 10.3 AXI Clock과 Pixel Clock 도메인 차이 문제
 
@@ -225,6 +229,7 @@ VGA Monitor
 - 필터 선택 값이 Pixel Clock 도메인에서 안정적으로 반영됨
 - 필터 전환 시 영상 출력 안정성이 향상됨
 
+<br>
 
 ### 10.4 OV7670 PCLK 비동기 타이밍 문제
 
