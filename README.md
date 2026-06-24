@@ -4,11 +4,7 @@
 
 ## 📌 1. Project Summary (프로젝트 요약)
 
-Basys3 FPGA 보드와 OV7670 카메라 모듈을 사용하여  
-카메라 영상을 입력받고, FPGA 내부에서 영상 필터를 적용한 뒤 VGA 모니터로 출력하는 프로젝트입니다.
-
-Verilog 기반 Custom IP를 제작하고, Vivado Block Design에서 MicroBlaze RISC-V, BRAM, VGA Controller, OV7670 Capture IP, Filter IP를 연결하여  
-실시간 카메라 영상 처리 시스템을 구현했습니다.
+Basys3 FPGA 보드와 OV7670 카메라 모듈을 사용하여 FPGA 내부에서 영상 필터를 적용한 뒤, VGA 모니터로 출력하는 프로젝트
 
 <br>
 
@@ -42,16 +38,6 @@ Verilog 기반 Custom IP를 제작하고, Vivado Block Design에서 MicroBlaze R
   <img src="https://img.shields.io/badge/Block%20Design-Vivado-yellow?style=for-the-badge">
 </p>
 
-<br>
-
-### 3.3 Hardware / IP
-
-<p>
-  <img src="https://img.shields.io/badge/Basys3-FPGA-red?style=for-the-badge">
-  <img src="https://img.shields.io/badge/OV7670-Camera-green?style=for-the-badge">
-  <img src="https://img.shields.io/badge/VGA-Display-purple?style=for-the-badge">
-  <img src="https://img.shields.io/badge/MicroBlaze%20RISC--V-Processor-blueviolet?style=for-the-badge">
-</p>
 
 <br>
 
@@ -136,237 +122,18 @@ VGA Monitor
 이미지 파일을 `images` 폴더에 넣은 뒤 아래 코드로 README에 추가할 수 있습니다.
 
 ```md
-![Block Design](./images/block_diagram.png)
+![Block Design](./images/Block Diagram_Select_Filter.png)
 ```
 
 <br>
 
-## 🔧 6. Custom IP Description (커스텀 IP 설명)
-
-### 6.1 OV7670 Config IP
-
-OV7670 카메라의 내부 레지스터를 설정하기 위한 Custom IP입니다.
-
-AXI4-Lite Register에 저장된 카메라 설정값을 SCCB 방식으로 OV7670에 전달합니다.  
-초기화가 완료되면 `init_done` 신호를 출력하여 카메라 캡처 IP가 정상적으로 동작할 수 있도록 합니다.
+## 🎬 7. Demonstration (시연 영상)
 
 <br>
+[![Video](./images/youtube.png)](https://www.youtube.com/watch?v=QpY_T1iv3Es)
 
-**주요 파일**
+### *이미지를 클릭하면 시연 영상으로 이동합니다.*
 
-| 파일명 | 설명 |
-|---|---|
-| `myip_ov7670_cfg_v2_0.v` | OV7670 설정 IP 최상위 모듈 |
-| `myip_ov7670_cfg_v2_0_S00_AXI.v` | AXI4-Lite Register 제어 |
-| `sccb_ctrl.v` | SCCB 통신 FSM 제어 |
-
-<br>
-
-**동작 흐름**
-
-```text
-MicroBlaze RISC-V
-      │
-      │ AXI4-Lite Register Write
-      ▼
-OV7670 Config IP
-      │
-      │ SCCB SCL / SDA
-      ▼
-OV7670 Camera Register Setting
-      │
-      ▼
-init_done 출력
-```
-
-<br>
-
----
-
-### 6.2 OV7670 Capture IP
-
-OV7670 카메라에서 들어오는 영상 데이터를 수신하여 BRAM에 저장하는 IP입니다.
-
-카메라 데이터는 8bit씩 두 번에 나누어 들어오며, 이를 RGB565 형식으로 조합한 뒤 RGB444 형식으로 변환하여 저장합니다.
-
-<br>
-
-**주요 기능**
-
-- `VSYNC` 신호로 프레임 시작 감지
-- `HREF` 신호로 유효 픽셀 구간 판단
-- `PCLK` 기준으로 카메라 데이터 수신
-- RGB565 → RGB444 변환
-- 320x240 크기의 영상 데이터를 BRAM에 저장
-- 디버그용 LED 출력
-
-<br>
-
-**동작 흐름**
-
-```text
-VSYNC 감지
-   ↓
-새 프레임 시작
-   ↓
-HREF High 구간에서 DATA[7:0] 수신
-   ↓
-상위 Byte / 하위 Byte 조합
-   ↓
-RGB565 → RGB444 변환
-   ↓
-BRAM Write
-```
-
-<br>
-
----
-
-### 6.3 VGA Controller IP
-
-BRAM에 저장된 카메라 픽셀 데이터를 읽어 VGA 모니터로 출력하는 IP입니다.
-
-VGA 640x480 해상도 타이밍을 생성하고, 320x240 카메라 영상을 화면 중앙에 배치하여 출력합니다.
-
-<br>
-
-**VGA 출력 정보**
-
-| 항목 | 값 |
-|---|---|
-| VGA 해상도 | 640 x 480 |
-| 카메라 영상 크기 | 320 x 240 |
-| Pixel Clock | 25MHz |
-| 출력 방식 | VGA RGB444 |
-| 영상 위치 | 화면 중앙 |
-
-<br>
-
-**출력 신호**
-
-| 신호 | 설명 |
-|---|---|
-| `r[3:0]` | VGA Red |
-| `g[3:0]` | VGA Green |
-| `b[3:0]` | VGA Blue |
-| `hsync` | Horizontal Sync |
-| `vsync` | Vertical Sync |
-
-<br>
-
----
-
-### 6.4 Image Filter IP
-
-BRAM에서 읽은 픽셀 데이터를 VGA로 출력하기 전에 필터 처리하는 Custom IP입니다.
-
-AXI Register에 저장된 `filter_sel` 값에 따라 필터 모드가 선택되며, 픽셀 단위로 실시간 필터 처리가 수행됩니다.
-
-<br>
-
-**지원 필터**
-
-| filter_sel | 필터 모드 | 설명 |
-|---|---|---|
-| 0 | Original | 원본 영상 출력 |
-| 1 | Grayscale | 흑백 영상 출력 |
-| 2 | Invert | 색상 반전 |
-| 3 | Brightness | 밝기 증가 |
-| 4 | Edge Detect | 엣지 검출 |
-| 5 | Blur | 블러 처리 |
-
-<br>
-
-**필터 처리 방식**
-
-```text
-BRAM Pixel Data
-      │
-      ▼
-Filter IP
-      │
-      ├── Original
-      ├── Grayscale
-      ├── Invert
-      ├── Brightness
-      ├── Edge Detect
-      └── Blur
-      │
-      ▼
-VGA Controller
-```
-
-<br>
-
-## 🔌 7. Pin Mapping (핀 매핑)
-
-### 7.1 OV7670 Camera
-
-| 신호 | 설명 |
-|---|---|
-| `d_0[7:0]` | 카메라 8bit 데이터 입력 |
-| `pclk_0` | 카메라 Pixel Clock |
-| `href_0` | 수평 유효 데이터 신호 |
-| `vsync_0` | 프레임 동기 신호 |
-| `MCLK_0` | 카메라 Master Clock |
-| `o_scl_0` | SCCB Clock |
-| `io_sda_0` | SCCB Data |
-
-<br>
-
-### 7.2 VGA Output
-
-| 신호 | 설명 |
-|---|---|
-| `r_0[3:0]` | VGA Red |
-| `g_0[3:0]` | VGA Green |
-| `b_0[3:0]` | VGA Blue |
-| `hsync_0` | VGA Horizontal Sync |
-| `vsync_1` | VGA Vertical Sync |
-
-<br>
-
-### 7.3 Debug LED
-
-| 신호 | 설명 |
-|---|---|
-| `led_init_done_0` | OV7670 초기화 완료 확인 |
-| `led_vsync_0` | VSYNC 수신 확인 |
-| `led_we_0` | BRAM Write Enable 확인 |
-
-<br>
-
-## ▶️ 8. How to Run (실행 방법)
-
-### 8.1 Vivado 프로젝트 실행
-
-1. Vivado 실행
-2. `SoC_best_vga_rgb_2.xpr` 파일 열기
-3. Block Design 확인
-4. Generate Bitstream 실행
-5. Hardware Manager에서 Basys3 보드 연결
-6. Bitstream 다운로드
-
-<br>
-
-### 8.2 하드웨어 연결
-
-1. Basys3 보드에 OV7670 카메라 모듈 연결
-2. VGA 케이블로 모니터 연결
-3. Basys3 보드 전원 연결
-4. Bitstream 다운로드 후 LED 상태 확인
-5. VGA 모니터에 카메라 영상 출력 확인
-
-<br>
-
-## 📺 9. Final Product (완성품)
-
-이미지 파일을 `images` 폴더에 넣은 뒤 아래 코드처럼 추가하면 됩니다.
-
-```md
-<img src="./images/final_product.jpg" width="45%">
-<img src="./images/vga_output.jpg" width="45%">
-```
 
 <br>
 
@@ -382,7 +149,7 @@ VGA Controller
 
 <br>
 
-## 🧯 10. Troubleshooting (문제 해결 기록)
+##  10. Troubleshooting (문제 해결 기록)
 
 ### 10.1 OV7670 초기화 전 영상 출력 문제
 
@@ -507,7 +274,7 @@ VGA Controller
 
 <br>
 
-## 🚀 11. Future Improvements (개선 사항)
+## 🔧 11. Future Improvements (개선 사항)
 
 - 버튼 또는 스위치를 이용한 필터 모드 변경 기능 추가
 - UART 명령을 통한 필터 모드 제어 기능 추가
@@ -517,14 +284,4 @@ VGA Controller
 - VGA 출력에서 HDMI 출력으로 확장
 - 원본 영상과 필터 적용 영상을 동시에 보여주는 분할 화면 모드 추가
 
-<br>
 
-## ✅ 12. Result (결과)
-
-- OV7670 카메라 입력 영상을 Basys3 FPGA에서 수신
-- BRAM 기반 프레임 버퍼 구성
-- VGA 모니터로 실시간 영상 출력 구현
-- Verilog Custom IP를 이용한 영상 필터 처리 구현
-- SCCB 초기화, 카메라 캡처, 필터 처리, VGA 출력을 하나의 SoC 구조로 통합
-
-<br>
