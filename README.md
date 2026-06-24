@@ -156,29 +156,24 @@ VGA Monitor
 - FPGA에 bitstream을 올린 직후 VGA 화면에 정상적인 카메라 영상이 출력되지 않음
 - 화면에 노이즈가 보이거나 색상이 깨져 보이는 문제가 발생함
 
-<br>
 
 **❓ 원인 분석**
 
 - OV7670 카메라는 내부 레지스터 설정이 완료된 뒤 안정적인 영상 데이터를 출력함
 - SCCB 초기화가 끝나기 전에 Capture IP가 동작하면 유효하지 않은 데이터가 BRAM에 저장될 수 있음
 
-<br>
 
 **❗ 해결 방법**
 
 - OV7670 Config IP에서 초기화 완료 신호인 `init_done`을 출력하도록 구성
 - `rst_and.v`를 통해 reset, clock locked, init_done 조건이 모두 만족된 뒤 Capture IP가 동작하도록 수정
 
-<br>
 
 **✅ 결과**
 
 - 카메라 초기화가 완료된 이후부터 영상 캡처가 시작되어 VGA 출력이 안정화됨
 
-<br>
 
----
 
 ### 10.2 VGA 화면 좌측 노이즈 픽셀 문제
 
@@ -186,14 +181,12 @@ VGA Monitor
 
 - VGA 화면의 왼쪽 가장자리 부분에 깨진 픽셀이나 노이즈가 표시됨
 
-<br>
 
 **❓ 원인 분석**
 
 - BRAM은 read 요청 후 데이터가 바로 나오지 않고 약간의 latency가 존재함
 - VGA 출력 타이밍과 BRAM read timing이 완전히 맞지 않아 화면 시작 부분에서 픽셀 위치가 어긋남
 
-<br>
 
 **❗ 해결 방법**
 
@@ -201,15 +194,11 @@ VGA Monitor
 - BRAM read latency를 고려하여 출력 구간을 조정
 - 화면 중앙 배치 좌표와 read address 생성 타이밍을 맞춤
 
-<br>
 
 **✅ 결과**
 
 - 좌측 노이즈 픽셀이 줄어들고 카메라 영상이 VGA 화면 중앙에 안정적으로 표시됨
 
-<br>
-
----
 
 ### 10.3 AXI Clock과 Pixel Clock 도메인 차이 문제
 
@@ -217,7 +206,6 @@ VGA Monitor
 
 - AXI Register에서 필터 값을 변경했을 때 필터 적용이 불안정하게 보일 가능성이 있음
 
-<br>
 
 **❓ 원인 분석**
 
@@ -225,23 +213,18 @@ VGA Monitor
 - 실제 픽셀 필터 처리는 Pixel Clock 도메인에서 수행됨
 - 서로 다른 Clock Domain의 신호를 바로 사용하면 메타스테빌리티 문제가 발생할 수 있음
 
-<br>
 
 **❗ 해결 방법**
 
 - `filter_ctrl.v` 내부에서 필터 선택 신호를 Pixel Clock에 동기화
 - 2-FF Synchronizer 구조를 적용하여 안정적으로 신호 전달
 
-<br>
 
 **✅ 결과**
 
 - 필터 선택 값이 Pixel Clock 도메인에서 안정적으로 반영됨
 - 필터 전환 시 영상 출력 안정성이 향상됨
 
-<br>
-
----
 
 ### 10.4 OV7670 PCLK 비동기 타이밍 문제
 
@@ -250,21 +233,17 @@ VGA Monitor
 - 카메라에서 들어오는 `PCLK`와 FPGA 내부 클럭이 서로 다른 클럭으로 동작함
 - Vivado Timing Report에서 timing violation이 발생할 수 있음
 
-<br>
 
 **❓ 원인 분석**
 
 - OV7670의 `PCLK`는 외부 카메라 모듈에서 들어오는 클럭임
 - FPGA 내부 Clock Wizard에서 생성한 클럭과 동기 관계가 아니기 때문에 별도 클럭 도메인으로 취급해야 함
 
-<br>
 
 **❗ 해결 방법**
 
 - XDC 파일에서 `PCLK`를 별도의 clock으로 정의
 - 내부 클럭과 카메라 PCLK를 asynchronous clock group으로 분리
-
-<br>
 
 **✅ 결과**
 
