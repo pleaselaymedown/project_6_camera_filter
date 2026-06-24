@@ -166,10 +166,11 @@ OV7670 카메라에서 들어오는 영상 데이터를 수신하여 BRAM에 저
 
 **RGB 변환 방식**
 
-```text
+```
+text
 OV7670 입력 데이터 : RGB565
 FPGA 내부 저장 데이터 : RGB444
-```
+
 
 ```verilog
 dout[11:8] <= d_reg[7:4];                 // R 4bit
