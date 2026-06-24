@@ -127,6 +127,7 @@ VGA Monitor
 ## 🎬 7. Demonstration (시연 영상)
 
 <br>
+
 [![Video](./images/youtube.png)](https://www.youtube.com/watch?v=QpY_T1iv3Es)
 
 ### *이미지를 클릭하면 시연 영상으로 이동합니다.*
