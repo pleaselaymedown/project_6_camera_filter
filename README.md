@@ -149,7 +149,6 @@ OV7670 카메라에서 들어오는 영상 데이터를 수신하여 BRAM에 저
 
 <br>
 
-
 **입출력 신호**
 
 | 신호           | 방향     | 설명                 |
@@ -166,11 +165,10 @@ OV7670 카메라에서 들어오는 영상 데이터를 수신하여 BRAM에 저
 
 **RGB 변환 방식**
 
-```
-text
+```text
 OV7670 입력 데이터 : RGB565
 FPGA 내부 저장 데이터 : RGB444
-
+```
 
 ```verilog
 dout[11:8] <= d_reg[7:4];                 // R 4bit
@@ -179,7 +177,6 @@ dout[ 3:0] <= d_delayed[4:1];             // B 4bit
 ```
 
 <br>
-
 
 ### 6.4 VGA Controller IP
 
@@ -204,15 +201,12 @@ VGA 모니터 출력
 
 <br>
 
-
 ### 6.5 Image Filter IP
 
 BRAM에서 읽은 카메라 픽셀 데이터를 VGA Controller로 보내기 전에 필터 처리하는 Custom IP이다.
 MicroBlaze-V가 AXI4-Lite Register에 `filter_sel` 값을 쓰면, 해당 값에 따라 실시간으로 필터 모드가 변경된다.
 
 <br>
-
-```
 
 **Register Map**
 
@@ -221,8 +215,6 @@ MicroBlaze-V가 AXI4-Lite Register에 `filter_sel` 값을 쓰면, 해당 값에 
 | `0x00`  | `filter_sel[2:0]` | 필터 모드 선택 |
 
 <br>
-
-```
 
 **Filter Mode**
 
@@ -237,8 +229,11 @@ MicroBlaze-V가 AXI4-Lite Register에 `filter_sel` 값을 쓰면, 해당 값에 
 
 <br>
 
-```
+### 6.6 Reset Control Module
 
+카메라 설정이 끝나기 전에 Capture IP가 먼저 동작하지 않도록 reset 조건을 분리하였다.
+
+<br>
 
 | Reset 신호       | 사용 대상                  | 조건                          |
 | -------------- | ---------------------- | --------------------------- |
@@ -251,13 +246,12 @@ MicroBlaze-V가 AXI4-Lite Register에 `filter_sel` 값을 쓰면, 해당 값에 
 
 <br>
 
-```
-
-### 5.2 Block Design
+## 🧩 7. Block Design
 
 <img src="./images/Block%20Diagram_Select_Filter.png" width="700">
 
 <br>
+
 
 ## 🎬 6. Demonstration (시연 영상)
 
