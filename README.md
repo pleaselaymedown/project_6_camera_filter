@@ -123,7 +123,6 @@ VGA Monitor
 
 <br>
 
----
 
 ### 6.2 OV7670 Config IP
 
@@ -180,7 +179,6 @@ dout[ 3:0] <= d_delayed[4:1];             // B 4bit
 
 <br>
 
----
 
 ### 6.4 VGA Controller IP
 
