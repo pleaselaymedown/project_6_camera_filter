@@ -10,6 +10,7 @@ Basys3 FPGA 보드와 OV7670 카메라 모듈을 사용하여 FPGA 내부에서 
 
 ## ✨ 2. Key Features (주요 기능)
 - OV7670 카메라 모듈로 영상을 입력받아 VGA 모니터에 출력
+- BRAM을 이용하여 카메라 영상 데이터를 저장하고 출력
 - 5가지 필터 모드 선택
 
 <br>
@@ -19,7 +20,7 @@ Basys3 FPGA 보드와 OV7670 카메라 모듈을 사용하여 FPGA 내부에서 
 ### 3.1 Language (사용언어)
 
 <p>
-  <img src="https://img.shields.io/badge/Verilog-HDL-blue?style=for-the-badge">
+  <img src="https://img.shields.io/badge/Verilog-blue?style=for-the-badge">
 </p>
 
 <br>
@@ -27,8 +28,8 @@ Basys3 FPGA 보드와 OV7670 카메라 모듈을 사용하여 FPGA 내부에서 
 ### 3.2 Development Environment (개발 환경)
 
 <p>
-  <img src="https://img.shields.io/badge/Vivado-2024.2-orange?style=for-the-badge">
-  <img src="https://img.shields.io/badge/Block%20Design-Vivado-yellow?style=for-the-badge">
+  <img src="https://img.shields.io/badge/Vivado-orange?style=for-the-badge">
+  <img src="https://img.shields.io/badge/Vitis-blueviolet?style=for-the-badge">
 </p>
 
 
