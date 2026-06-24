@@ -107,12 +107,149 @@ VGA Controller IP
       │ RGB / HSYNC / VSYNC
       ▼
 VGA Monitor
+
+```
+## 🔌 6. Custom IP Description (커스텀 IP 설명)
+<br>
+
+### 6.1 Custom IP Summary
+
+| Custom IP             | 역할                         |
+| --------------------- | -------------------------- |
+| `myip_ov7670_cfg`     |  OV7670 카메라 레지스터 초기화        |
+| `myip_ov7670_capture` |  OV7670 영상 데이터 수신 및 BRAM 저장 |
+| `myip_vga_controller` |  VGA 640×480 출력 타이밍 생성      |
+| `myip_filter`         |  실시간 영상 필터 처리               |
+
+<br>
+
+---
+
+### 6.2 OV7670 Config IP
+
+OV7670 카메라의 내부 레지스터를 설정하기 위한 Custom IP이다.
+MicroBlaze-V가 AXI4-Lite Register에 카메라 설정값을 저장하면, IP 내부의 `sccb_ctrl` 모듈이 SCCB 통신을 통해 OV7670 카메라에 설정값을 전송한다.
+
+
+<br>
+
+**Register Map**
+
+| Address  | Register         | 설명                                         |
+| -------- | ---------------- | ------------------------------------------ |
+| `0x00`   | Control / Status | `[0] start`, `[5:1] num_regs`, `[31] done` |
+| `0x04 ~` | Config Register  | `[23:16] reg_addr`, `[7:0] reg_data`       |
+
+<br>
+
+
+### 6.3 OV7670 Capture IP
+
+OV7670 카메라에서 들어오는 영상 데이터를 수신하여 BRAM에 저장하는 Custom IP이다.
+카메라의 `PCLK`, `VSYNC`, `HREF`, `DATA[7:0]` 신호를 이용해 픽셀 데이터를 읽고, RGB565 형식의 데이터를 RGB444 형식으로 변환한다.
+
+<br>
+
+
+**입출력 신호**
+
+| 신호           | 방향     | 설명                 |
+| ------------ | ------ | ------------------ |
+| `pclk`       | Input  | OV7670 Pixel Clock |
+| `vsync`      | Input  | 프레임 동기 신호          |
+| `href`       | Input  | 유효 픽셀 구간 신호        |
+| `d[7:0]`     | Input  | 카메라 데이터            |
+| `addr[16:0]` | Output | BRAM Write Address |
+| `dout[11:0]` | Output | RGB444 픽셀 데이터      |
+| `we`         | Output | BRAM Write Enable  |
+
+<br>
+
+**RGB 변환 방식**
+
+```text
+OV7670 입력 데이터 : RGB565
+FPGA 내부 저장 데이터 : RGB444
+```
+
+```verilog
+dout[11:8] <= d_reg[7:4];                 // R 4bit
+dout[ 7:4] <= {d_reg[2:0], d_delayed[7]}; // G 4bit
+dout[ 3:0] <= d_delayed[4:1];             // B 4bit
 ```
 
 <br>
 
+---
+
+### 6.4 VGA Controller IP
+
+BRAM에서 읽어온 픽셀 데이터를 VGA 신호로 변환하여 모니터에 출력하는 Custom IP이다.
+`25MHz` Pixel Clock을 기준으로 VGA `640×480 @ 60Hz` 타이밍을 생성하고, `320×240` 카메라 영상을 화면 중앙에 표시한다.
+
+<br>
+
+**동작 흐름**
+
+```text
+BRAM Read Address 생성
+    ↓
+BRAM에서 픽셀 데이터 읽기
+    ↓
+Filter IP에서 필터 처리
+    ↓
+VGA Controller로 RGB 데이터 전달
+    ↓
+VGA 모니터 출력
+```
+
+<br>
+
+
+### 6.5 Image Filter IP
+
+BRAM에서 읽은 카메라 픽셀 데이터를 VGA Controller로 보내기 전에 필터 처리하는 Custom IP이다.
+MicroBlaze-V가 AXI4-Lite Register에 `filter_sel` 값을 쓰면, 해당 값에 따라 실시간으로 필터 모드가 변경된다.
+
+<br>
+
+**Register Map**
+
+| Address | Register          | 설명       |
+| ------- | ----------------- | -------- |
+| `0x00`  | `filter_sel[2:0]` | 필터 모드 선택 |
+
+<br>
+
+**Filter Mode**
+
+| filter_sel | 필터 모드       | 설명                             |
+| ---------- | ----------- | ------------------------------ |
+| `0`        | Original    | 원본 영상 출력                       |
+| `1`        | Grayscale   | `(R + 2G + B) / 4` 방식의 흑백 변환   |
+| `2`        | Invert      | RGB 색상 반전                      |
+| `3`        | Brightness  | 각 RGB 채널에 `+4` 적용              |
+| `4`        | Edge Detect | 현재 라인과 이전 라인의 픽셀 차이를 이용한 엣지 검출 |
+| `5`        | Blur        | 현재 라인과 이전 라인의 평균값을 이용한 블러 처리   |
+
+<br>
+
+```
+
+
+| Reset 신호       | 사용 대상                  | 조건                          |
+| -------------- | ---------------------- | --------------------------- |
+| `rstn_basic`   | VGA Controller 등 기본 모듈 | `rstn & locked`             |
+| `rstn_capture` | OV7670 Capture IP      | `rstn & locked & init_done` |
+
+<br>
+
+이를 통해 카메라 설정이 끝나기 전에 Capture IP가 먼저 동작하는 문제를 방지하였다.
+
+<br>
+
+
 ### 5.2 Block Design
-.
 
 <img src="./images/Block%20Diagram_Select_Filter.png" width="700">
 
